@@ -1,0 +1,249 @@
+=== MySQL browser ===
+
+With this application you can draw a blueprint of 
+all databases, tables, columns, stored procedures and function inside a given database server.
+After which you are free to browse through them causing no further load on the database 
+and making it easier to to get an overview of everything that there is.
+
+
+== Version history ==
+
+v0.5 (sep 2022)
+- Implemented working encryption for password on database connection
+- Implemented implemented caching of indexes
+- Indexes are now shown under Browse DB verbose
+- Made database selectable in the Browse DB and Browse DB Verbose logic
+- Can now update individual database through the database management tab
+
+
+v0.4.4b2
+- Implemented memory profiler to have a look at the memory usage of the MemoryCacher during usage.
+- Half way through implementing a connection stats version that does 1 call for all its requests per poll. And draws everything browser sided in pure Javscript.
+
+v0.4.4b1
+- Implemented APC caching method (not tested)
+- Implemented file disk caching method (not tested)
+
+
+v0.4.4b0
+- Beta release 
+- For use of Shared Memory (shmop) for the connection statistics to further reduce system resources and run time.
+
+
+v0.4.3
+- Second iteration to split connection statistics.
+-- This solution works with Ajax calls. However, does 3 calls per update, layout is still drawn by the server and directly put in to a div.
+-- However, again uses less resources and does not longer flicker on screen.
+-- Added indication for when the background processor is stall (between 2 or 5 sec old) or stopped (older then 5 sec)
+
+
+v0.4.2
+- First iteration to split connection statistics into an update mechanism and a front end
+-- Current front end solution works (very stupidly) with Iframes
+- Background process writes 3 files:
+-- Connection stats, based on aggregated query information and connection data (shows how long a query has run and when a sleep occurred)
+-- Process status table, the most recent output of the query 'SHOW FULL PROCESSLIST'
+-- Connection meta, holding data about the update script, when it started, how the run times are in min, avg, max and when it has last run.
+- Background process has protection against parallel running calls. It identifies this through the start time has in the meta file. (they must match)
+-- else it stops execution, assuming the script that wrote the other hash will take over.
+
+
+
+v0.4.1
+- The alter statements for stored procedures and functions are now shown (in a thin line) and can now be clicked to expand them to view them completely
+- Added syntax highlighting for alter statements
+
+v0.4
+- Added config page, save config in FileCache and made other application dependencies work with it
+
+v0.3
+- Iframe based index, based upon the available scripts within /pages
+- DB can be updated as one big update through page.Update_Cache.php
+- Can watch 
+-- basic layout (DB's, tables and fields)
+-- Additionally sizes of DB and tables, field types, nr rows
+-- Functions and stored procedures with input and output parameters
+- Use browser CTRL + F search to look through the database
+
+
+
+== Roadmap ==
+
+- Let the generation 5 connection state manager restart itself after a while to (hopefully) fix a hard crash that occurs.
+- Split off querries in to seperate memory keys
+-- Prefix + Query hash = key
+-- Save counts + min, avg and max run times with the queries
+
+--- Further stabilize the shmop function (never worked with it before, need to figure out how stable this function actually is)
+--- Implement alternatives for memorycacher (APC, Memcached and disk write)
+--- Implement fallback (to periodically save results to recover from ram being cleared) by saving memory contents to disk
+--- Integrate in regular configuration screen so people can use it
+--- Create unit tests to test every memorycacher type to work effectively
+---- Will it run (has required classes and settings).
+---- Will it save and correctly load a couple of given strings.
+---- How many read writes can it do within a given time frame (for indication)
+
+- Implementation of jqwidget
+-- http://megatron.osn.cl/test/jqwidget/
+-- http://www.jqwidgets.com/jquery-widgets-documentation/
+
+
+- Improve basic functions
+- Make it so the user can look at the ALTER statement of a function or stored procedure
+V-- Show it on a div block so it is visible
+V-- Make it expandable (on click)
+--- Make is collapsable when it is expended (not on click, else you can not select. Propose a close button or similar)
+--- Make it so you can open a function or stored procedure on a new page
+V- Use highlight.js or other for syntax highlighting for ALTER statements
+-- Apply highlighting for other query texts
+
+- Introduce profiles
+-- Introduce an interface to give a profile a name
+-- Put a set of connection data inside a seperate data folder
+-- Put all data that has ben generated for a connection in a seperate data foler
+-- Require the user to select a profile before they can further use the application
+--- Add a way to duplicate a profile
+
+- Make a improved update cache page
+-- Show 'last update date/time'
+-- Make it so you can update separately:
+--- Everything
+--- All databases
+--- Individual databases
+--- Functions
+--- Stored procedures
+-- Show progress on per task base (if a task is queed and if it is running)
+--- Show per task how many sub tasks are done of number of total
+--- Show per task start time and run time
+--- Show full output as an optional thing to open
+-- Preferably everything asynchronously
+-- Possible solution is using iframes or ajax calls and storing progress inside a cache key
+
+- Improve update caches to compare any changes with a previous version and store these changes separately
+-- DB not found
+-- Table
+--- Added
+--- Removed
+-- Field
+--- Added
+--- Updated (context)
+--- Removed
+-- Include inside the changes file between which update date/times the change occured
+-- Build a browser page to show these changes, separated with a header with the change date (and previous update date / time)
+
+- Include column index on tables/fields to be cached inside the application
+-- Include a way to browse them within the application
+
+- Fixing the memory cacher class so hot (frequently changed) updates can be stored there
+-- Adding a periodically store option to memory cache so it's contents can be dumped/backuped to filecacher
+-- Add a restore function on first access of file cacher so historic data does not get lost
+
+- Improve page.DB_ConnectionStats.php
+V- Use a background processor that can be turn on and off separately and has a quicker run time to get connection information
+V- Use Ajax calls to get the current available information for showing
+--- Use JavaScript (rendering) for showing this information (instead of pure PHP logic)
+--- Bonus: use ExtJS / Ext Core / JQuery and make it look great.
+-- Feedback on last update
+V- Average time of the background process 
+--- and Ajax calls in load averages (last update, last minute, last 5 minutes)
+-- Show database response time
+--- Bonus: show all these in a graph on request
+-- Give an option to visually truncate sleep (show it in a single block in the format [runtime * number of times + current sleep runtime])
+
+- Improve config possibilities
+V- Make a config page to setup: db connect info (host, port, user, password)
+V- Store DB password inside a config file (fileCacher)
+V-- Make encryption an option
+!--- Make sure encryption actually works
+
+- Submit on git(hub) or BitBucket
+-- Exclude the contents of the data directory
+-- Include a full description and short manual
+
+- Use build search feature for data within the pages
+-- Possibility to search part of (anything) and only show that
+-- Use limiters for search (database, table, field)
+-- Have a look at database sided sql for quicker processing
+--- If it could work, make a datamodel that does not necassery rely on the existence of sql (lite), but uses it when it is available
+-- Make it to limit the output to a single database on use select
+
+
+- Make the whole project more consistent in use and technical function
+-- Consider using Silex. Which is a PHP microframework based on Symfony 2 (proof of concept project)
+-- Consider using ExtJs/JQuery with a good abstraction layer for the front end.
+
+- Create an Excel like editor
+-- Change field values by just clicking on them and editing them.
+-- Click on columns to add a column and set their name and data type (through a menu or all actions in plain view).
+-- Fully transactional: everything after the table has been loaded (columns and data) changes on the browser side, till you decide to commit/save.
+-- Color code rows, cells and column:, yellow is changed, green is new (column or row), red with grey text is deleted.
+-- Option to auto commit after every change 
+--- leave cell after edit
+--- set name and data type of column
+--- adding or removing a row or column immediately executes actions on the database
+-- Show the select query that retrieves this table.
+--- Only show the parts that are valid to be changed.
+--- Color the row that causes an error when one is produced.
+--- Option to change the limit
+---- Should be set by default
+--- Option to change the order
+---- Also by selecting them on the columns themselves
+--- Option to set actual filters
+---- Also selectable through the columns
+-- Option to make virtual columns that feature a calculation
+
+- Introduce soft link system
+-- Make it possible to link 2 fields (over any db or table) to each other. And store the link inside the MySQL browser
+--- Implicitly define the type of relation 
+---- 1:1 / 1:N 
+---- implicit (must be filled) / optional (can be null) and in which direction
+-- Show relations at both fields (type + db.table.foreign field)
+-- Attempt to build an auto discovery: 
+--- when a field ends on Id (ends, is not ID itself)
+---- first look if there is a table that matches (Field named SomethingSomethingID == Table named SomethingSomething) within this database
+---- Look at a field in all databases (excluding the current database)
+--- Show all found matches and level of proposition (matches within first context and second context) 
+---- with possibility to make quick (single click) decisions and accept all
+-- Introduce a single click to check a soft link
+--- Total number of records in both tables
+--- Min, Avg and Max number of link records per record
+--- Number of orphaned records (have a foreign id to a record that does not exist)
+--- Number of records that have no relation (NULL) 
+--- Does found counts fit the described relation
+--- Optionally be able to retrieve the queries used to do an own analyses
+--- Soft link should NEVER break any part of the system, but only produce warnings when a link does no longer actually exist (db, table or field gone in new update)
+
+- Query builder base upon soft link system
+-- When a logical set of tables is given
+--- Validate
+--- When correct, show a valid query that can be used to query with it (do not execute the query within the application)
+-- A to B auto discovery
+--- When 2 tables are provided the system attempts to find a path between them through the soft link system 
+--- using available information about the soft link type
+---- Implicit means full join
+---- Optional means left outer join
+--- Show the query to retrieve said joins
+--- Optionally option to separate the fields between the tables with | or db+table name ->
+
+- Query relation browser
+-- When through the query builder a query is defined, it should be able to run here
+-- When put in to the query relation browser, it should be available in a 'quick select' menu or history
+-- Instead of showing a flat list the Query relation browser shows records within their relations.
+--- Example:
+---- 1 Orderheader 
+----- 1 OrderLine 
+------ 2 OrderTransaction
+----- 1 OrderLine 
+------ 1 OrderTransaction
+-- It attempts to count the number of records in every relation first.
+--- If it overreaches a certain threshold of number of records, a warning is given
+-- parameters to reduce the number of records can be provided in form of:
+--- limit
+--- ID's included within the query
+-- Actually running this query should be done separately
+-- The result should be stored
+--- Show 
+---- size in disk usage
+---- total number of rows inside each slice
+---- total number of unique rows inside each slice
+

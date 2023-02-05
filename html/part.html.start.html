@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="../css/style.css" />
+        <!-- Highlight.js -->
+        <link rel="stylesheet" href="../css/highlight_js/default.css">
+        <script src="../js/jquery-2.1.4.min.js"></script>
+        <script src="../js/highlight.pack.js"></script>
+        <script src="../js/app.js"></script>
+        <script>
+            
+            function applyHighlightJsToEl(fElId){
+                var el = document.getElementById(fElId); 
+                
+                if(!el){
+                    return;
+                }
+                
+                if(el.className == 'text-block-statement'){
+                    el.className += ' text-block-expanded'; 
+
+                    //hljs is a known global
+                    hljs.highlightBlock(el);
+                }
+                
+            };
+            
+        </script>
+        <!--script>hljs.initHighlightingOnLoad();</script-->
+        
+    </head>
+    <body>

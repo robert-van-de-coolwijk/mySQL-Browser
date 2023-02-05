@@ -1,0 +1,149 @@
+
+/* 
+    Created on : 25-sep-2015, 9:08:01
+    Author     : datvandecor
+*/
+
+html, body{
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    font-family: verdana;
+}
+
+table {
+    
+    border-collapse: collapse;
+}
+
+table, th, td {
+    
+    border: 1px solid black;
+}
+
+.full-width{
+    width: 100%;
+}
+
+#main_menu{
+    position: absolute;
+    top: 2px;
+    bottom: 2px;
+    left: 2px;
+    width: 180px;
+    border: 1px solid #777700;
+}
+
+#main_menu a{
+    display: block;
+    height: 30px;
+    margin: 4px;
+    padding: 2px;
+    line-height: 30px;
+    border: 1px solid #4444ff;
+    text-decoration: none;
+    font-size: 14px;
+    background-color: #EEEEFF;
+    border-radius: 3px;
+}
+
+#main_menu a:hover{
+    background-color: #CCCCFF;
+}
+
+#main_frame{
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    bottom: 2px;
+    left: 190px;
+    border: 1px solid #000000;
+    
+}
+
+.stick-to-top-menu{
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 5px;
+    width: auto;
+    border: 1px solid #AAA;
+}
+
+
+.suffix-subtext{
+/*    font-size: 1px;
+    width: 1px;
+    display: inline-block;
+    overflow: hidden;*/
+    color: #DDDDDD;
+}
+
+.postfix-subtext{
+    color: #999999;
+}
+
+.subtext-params{
+    color: #999999;
+}
+
+.subtext-returntype{
+    color: #444444;
+    font-weight: bold;
+}
+
+.table-details, .database-details{
+    border: 1px solid #AAAAAA;
+    margin: 2px 5px 0 5px;
+    padding: 2px;
+}
+
+.col-number-format{
+    text-align: right;
+}
+
+.text-block-statement{
+    height: 12px; 
+    margin: 2px 5px 6px 5px; 
+    padding: 4px;
+    border: 1px solid #CCCCCC; 
+    background-color: #FAFAFA; 
+    font-size: 80%;
+    color: #777777;
+    overflow: hidden; 
+    cursor: pointer;
+    white-space: pre;
+}
+
+.text-block-expanded{
+    height: auto;
+    cursor: default;
+    border: 1px solid #666666; 
+    background-color: #EEEEEE; 
+    color: #000000;
+}
+
+
+.clear-iframe{
+    border: 1px solid #333333;
+}
+
+.status-block{
+    display: inline;
+    padding: 1px 4px;
+    color: #FFFFFF;
+}
+
+.status-negative{
+    background-color: #BB0000;
+}
+
+.status-positive{
+    background-color: #00BB00;
+}
+
+.status-critical{
+    background-color: #880000;
+}
+
