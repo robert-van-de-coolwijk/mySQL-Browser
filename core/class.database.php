@@ -2,13 +2,13 @@
 
 /**
  * Database connection class
- * based on mysqli in object oriented mode
+ * based on mysqli object oriented variant
  */
 class Database {
+    
     private $mysqli;
 
-
-    public function __construct($fHost, $fUser, $fPass, $fDatabaseName, $fPort = '', $fPersistentConnection = false) {
+    protected function __construct($fHost, $fUser, $fPass, $fDatabaseName, $fPort = '', $fPersistentConnection = false) {
         if($fPersistentConnection == true) {
             $fHost = 'p:' . $fHost;
         }
@@ -20,6 +20,11 @@ class Database {
         $this->mysqli = $this->CreateDatabaseConnection($fHost, $fUser, $fPass, $fDatabaseName);
     }
 
+    /**
+     * Returns this class initialized with values from the config
+     * 
+     * @return \Database
+     */
     public static function createConnectionFromConfig() {
         include_once("../config/config.php");
         include_once("../core/class.filecacher.php");
@@ -42,7 +47,16 @@ class Database {
         return $db;
     }
 
-    public function CreateDatabaseConnection($fHost, $fUser, $fPass, $fDatabaseName = null) {
+    /**
+     * Wrapper method for initializing the msqli object
+     * 
+     * @param string $fHost
+     * @param string $fUser
+     * @param string $fPass
+     * @param string $fDatabaseName
+     * @return mysqli
+     */
+    protected function CreateDatabaseConnection($fHost, $fUser, $fPass, $fDatabaseName = null) {
         $mysqli = mysqli_init();
         if(!$mysqli) {
             die('mysqli_init failed');
@@ -69,6 +83,13 @@ class Database {
         return $mysqli;
     }
 
+    /**
+     * Execute given query and return the resultset or exit
+     * 
+     * @param string $fQuery
+     * @param enuml $fResultModus
+     * @return resultset
+     */
     protected function DoQuery($fQuery, $fResultModus = MYSQLI_USE_RESULT) {
         $msqlResult = mysqli_query($this->mysqli, $fQuery, $fResultModus);
 
@@ -81,9 +102,11 @@ class Database {
         return $msqlResult;
     }
 
-    #----------------------------------------------------------------------------
-    # Retrieves all databases
-    #----------------------------------------------------------------------------
+    /**
+     * Retrieves all databases
+     * 
+     * @return array
+     */
     public function GetAllDatabaseNames() {
         $query = 'show databases';
 
@@ -104,6 +127,12 @@ class Database {
         return $dbArr;
     }
 
+    /**
+     * Get the table scheme and size of given table name
+     * 
+     * @param string $fDatabaseName
+     * @return object
+     */
     public function GetDatabaseDetails($fDatabaseName) {
         $query = sprintf(
             '
@@ -137,7 +166,9 @@ class Database {
     }
 
     /**
-     * @param $fDatabaseName
+     * Gets a list of tables on given databasename
+     * 
+     * @param string $fDatabaseName
      * @return array
      */
     public function GetAllTableNamesFromDatabase($fDatabaseName) {
@@ -165,8 +196,8 @@ class Database {
     }
 
     /**
-     * @param $fDatabaseName
-     * @param $fTableName
+     * @param sting $fDatabaseName
+     * @param string $fTableName
      * @return object
      */
     public function GetTableDetails($fDatabaseName, $fTableName) {
@@ -208,8 +239,8 @@ class Database {
     }
 
     /**
-     * @param $fDatabaseName
-     * @param $fTableName
+     * @param string $fDatabaseName
+     * @param string $fTableName
      * @return array
      */
     public function GetTableFieldDetails($fDatabaseName, $fTableName) {
@@ -242,6 +273,13 @@ class Database {
         return $fieldArr;
     }
 
+    /**
+     * Get an array describing the index on given table
+     * 
+     * @param string $fDatabaseName
+     * @param string $fTableName
+     * @return array
+     */
     public function GetIndexes($fDatabaseName, $fTableName) {
         $query = sprintf("
         select 
@@ -290,6 +328,11 @@ class Database {
         return $resArr;
     }
 
+    /**
+     * Retrieves a list of all functions on the whole SQL server
+     * 
+     * @return array
+     */
     public function GetFunctions() {
         $query = sprintf('SHOW FUNCTION STATUS');
 
@@ -313,6 +356,11 @@ class Database {
         return $resArr;
     }
 
+    /**
+     * Retrieves a list of all stored procedures on the whole SQL server
+     * 
+     * @return array
+     */
     public function GetProcedures() {
         $query = sprintf('SHOW PROCEDURE STATUS');
 
@@ -336,6 +384,14 @@ class Database {
         return $resArr;
     }
 
+    /**
+     * Gets a dump of the create command of given function
+     * 
+     * @param string $fDatabaseName
+     * @param string $fFnName
+     * @param string $fBaseObject
+     * @return object
+     */
     public function GetFunctionDetails($fDatabaseName, $fFnName, $fBaseObject) {
         $query = sprintf('SHOW CREATE FUNCTION `%s`.`%s`', $fDatabaseName, $fFnName);
 
@@ -379,6 +435,14 @@ class Database {
         return $fBaseObject;
     }
 
+    /**
+     * Gets a dump of the create command of given stored procedure
+     * 
+     * @param string $fDatabaseName
+     * @param string $fProcedureName
+     * @param string $fBaseObject
+     * @return object
+     */
     public function GetProcedureDetails($fDatabaseName, $fProcedureName, $fBaseObject) {
         //databases to skip (which will fail the query)
         $skipDB = ['Print', 'VIEW'];
@@ -437,6 +501,11 @@ class Database {
         return $fBaseObject;
     }
 
+    /**
+     * Gives a list of connection produced by the processlist command
+     * 
+     * @return type
+     */
     public function GetConnectionStats() {
         $query = sprintf('SHOW FULL PROCESSLIST');
 
@@ -459,10 +528,12 @@ class Database {
 
         return $resArr;
     }
-
-    #----------------------------------------------------------------------------
-    # Close connection
-    #----------------------------------------------------------------------------
+    
+    /**
+     * Close connection
+     * 
+     * @return void
+     */
     public function Close() {
         $this->mysqli->close();
     }
