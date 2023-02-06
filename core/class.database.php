@@ -1,6 +1,9 @@
 <?php
 
-
+/**
+ * Database connection class
+ * based on mysqli in object oriented mode
+ */
 class Database {
     private $mysqli;
 
@@ -30,7 +33,7 @@ class Database {
         $CO = $configObj;
         $password = $CO->db_pass;
 
-        if($CO->db_pass_encr == '1') {
+        if(isset($CO->db_pass_encr) && $CO->db_pass_encr == '1') {
             $password = Tools::decrypt($CO->db_pass);
         }
 

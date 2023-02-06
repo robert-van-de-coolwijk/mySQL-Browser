@@ -186,7 +186,7 @@ echo '<form action="?" method="post">';
 
             if(
                 $key == 'db_pass' &&
-                $configObj->db_pass_encr == '1' &&
+                ($configObj->db_pass_encr ?? null) == '1' &&
                 !empty($configObj->db_pass)
             ) {
                 $value = '';
